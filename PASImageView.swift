@@ -10,7 +10,7 @@ import UIKit
 import QuartzCore
 
 let spm_identifier  = "pas.imagecache.tg"
-let kLineWidth      :CGFloat = 3.0
+let kLineWidth      :CGFloat = 1.5
 
 func rad(degrees : Float) -> Float {
     return ((degrees) / Float((180.0/M_PI)))

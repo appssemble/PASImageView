@@ -22,7 +22,7 @@ final class ImageCache : NSObject {
     let fileManager = FileManager.default
     
     override init() {
-        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory, FileManager.SearchPathDomainMask.userDomainMask, true) 
+        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let rootCachePath = paths[0]
         
         
@@ -44,9 +44,9 @@ final class ImageCache : NSObject {
         let fileExtension = URL.pathExtension
         var data : NSData?
         if fileExtension == "png" {
-            data = UIImagePNGRepresentation(image) as NSData?
+            data = image.pngData() as NSData?
         } else if fileExtension == "jpg" || fileExtension == "jpeg" {
-            data = UIImageJPEGRepresentation(image, 1.0) as NSData?
+            data = image.jpegData(compressionQuality: 1.0) as NSData?
         }
         
         guard let imageData = data, let cachePath = self.cachePath else { return }
@@ -121,13 +121,13 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
     }
     
     //MARK:- Action
-
-    func handleSingleTap(gesture: UIGestureRecognizer) {
+    
+    @objc func handleSingleTap(gesture: UIGestureRecognizer) {
         delegate?.PAImageView(didTapped: self)
     }
     
     //MARK:- Private methods
-
+    
     private func setConstraints() {
         
         // containerImageView
@@ -201,13 +201,13 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
             UIView.animate(withDuration: duration, delay: delay, options: [.curveEaseOut], animations: {
                 self.containerImageView.transform   = CGAffineTransform.identity
                 self.containerImageView.alpha       = 1.0
-                }, completion: nil)
-            }, completion: { finished in
-                self.progressLayer.strokeColor = self.backgroundProgressColor.cgColor
-                UIView.animate(withDuration: duration, animations: {
-                    self.progressContainer.transform    = CGAffineTransform.identity
-                    self.progressContainer.alpha        = 1.0
-                })
+            }, completion: nil)
+        }, completion: { finished in
+            self.progressLayer.strokeColor = self.backgroundProgressColor.cgColor
+            UIView.animate(withDuration: duration, animations: {
+                self.progressContainer.transform    = CGAffineTransform.identity
+                self.progressContainer.alpha        = 1.0
+            })
         })
     }
     
@@ -215,10 +215,10 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
         let arcCenter   = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         let radius      = Float(min(self.bounds.midX - 1, self.bounds.midY-1))
         let circlePath = UIBezierPath(arcCenter: arcCenter,
-            radius: CGFloat(radius),
-            startAngle: CGFloat(-rad(degrees: Float(90))),
-            endAngle: CGFloat(rad(degrees: 360-90)),
-            clockwise: true)
+                                      radius: CGFloat(radius),
+                                      startAngle: CGFloat(-rad(degrees: Float(90))),
+                                      endAngle: CGFloat(rad(degrees: 360-90)),
+                                      clockwise: true)
         
         backgroundLayer.path           = circlePath.cgPath
         progressLayer.path             = backgroundLayer.path
@@ -243,7 +243,7 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
     //MARK:- URLSessionDownloadDelegate implemention
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-       
+        
         if let data =  try? Data(contentsOf: location) {
             let image = UIImage(data: data)
             DispatchQueue.main.async {
@@ -259,13 +259,13 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
     }
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-            let progress: CGFloat = CGFloat(totalBytesWritten)/CGFloat(totalBytesExpectedToWrite)
+        let progress: CGFloat = CGFloat(totalBytesWritten)/CGFloat(totalBytesExpectedToWrite)
         DispatchQueue.main.async {
-                self.progressLayer.strokeEnd        = progress
-                self.backgroundLayer.strokeStart    = progress
-            }
+            self.progressLayer.strokeEnd        = progress
+            self.backgroundLayer.strokeStart    = progress
+        }
     }
-
+    
     
 }
 

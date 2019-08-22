@@ -88,6 +88,7 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
     
     public var cacheEnabled                = true
     public var delegate                    :PASImageViewDelegate?
+    public var downloadFinishedCallback: (() -> ())?
     
     private var backgroundLayer             = CAShapeLayer()
     private var progressLayer               = CAShapeLayer()
@@ -248,6 +249,7 @@ public class PASImageView : UIView, URLSessionDownloadDelegate {
             let image = UIImage(data: data)
             DispatchQueue.main.async {
                 self.update(image: image , animated: true)
+                self.downloadFinishedCallback?()
             }
             if cacheEnabled {
                 if let url = downloadTask.response?.url {
